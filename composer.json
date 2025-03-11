@@ -10,6 +10,8 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "setasign/fpdi": "^2.6",
+        "tecnickcom/tcpdf": "^6.8",
         "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {

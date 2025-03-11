@@ -8,9 +8,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', '應用程式') - Laravel JWT</title>
 
-    <!-- 引入自訂 CSS -->
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
-
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Google Fonts - Nunito -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Alpine.js -->

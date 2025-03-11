@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function () {
+    return view('auth.login');
+});
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -25,3 +31,18 @@ Route::get('/dashboard', function () {
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
+
+// Route::get('/upload', [WorkController::class, 'create'])->name('upload');
+Route::get('/upload', [WorkController::class, 'create'])->name('upload');
+Route::post('/upload', [WorkController::class, 'store']);
+
+Route::get('/upload_lesson', [LessonController::class, 'create'])->name('upload_lesson');
+Route::post('/upload_lesson', [LessonController::class, 'store']);
+
+
+Route::get('/competition/submit', [CompetitionController::class, 'create'])->name('competition.submit');
+Route::post('/competition/submit', [CompetitionController::class, 'store']);
+
+Route::get('/work/{id}', [WorkController::class, 'show'])->name('work.show');
+Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
+Route::get('/competition/{id}', [CompetitionController::class, 'show'])->name('competition.show');
