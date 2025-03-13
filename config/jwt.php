@@ -103,6 +103,8 @@ return [
 
     'ttl' => env('JWT_TTL', 60),
 
+    'token_in_cookie' => true,
+    'cookie_key' => 'access_token', // 您 cookie 中存放 token 的名稱
     /*
     |--------------------------------------------------------------------------
     | Refresh time to live

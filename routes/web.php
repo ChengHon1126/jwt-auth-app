@@ -24,14 +24,20 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->name('dashboard');
 // 註冊頁面路由（如需要）
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
+Route::middleware(['jwt.cookie.auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
+    // 其他受保護的路由...
+});
 // Route::get('/upload', [WorkController::class, 'create'])->name('upload');
 Route::get('/upload', [WorkController::class, 'create'])->name('upload');
 Route::post('/upload', [WorkController::class, 'store']);

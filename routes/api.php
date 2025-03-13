@@ -23,8 +23,9 @@ Route::post('/auth/register', [RegisterController::class, 'register']);
 
 
 // 登入路由
-Route::post('/auth/login', [LoginController::class, 'login']);
-Route::post('/auth/logout', [LoginController::class, 'logout'])->middleware('auth:api');
-Route::post('/auth/refresh', [LoginController::class, 'refresh'])->middleware('auth:api');
-Route::get('/auth/me', [LoginController::class, 'me'])->middleware('auth:api');
-
+Route::post('/auth/login', [LoginController::class, 'login'])->middleware('set.access.cookie');
+Route::middleware(['extract.jwt.from.Cookie', 'auth:api'])->group(function () {
+    Route::post('/auth/logout', [LoginController::class, 'logout']);
+    Route::post('/auth/refresh', [LoginController::class, 'refresh']);
+    Route::get('/auth/me', [LoginController::class, 'me']);
+});
