@@ -16,10 +16,7 @@ class JwtAuthenticateFromCookie
         // 先從 cookie 取得 token
         // Log::info($request->headers->get('Authorization'));
         $token = $request->cookie('access_token');
-        $cookies = $request->cookies->all();
-        Log::info('所有 cookies: ', $cookies);
         if (!$token) {
-            Log::info('Cookie 中沒有 token');
             if ($request->expectsJson()) {
                 return response()->json(['message' => '未授權'], 401);
             }

@@ -67,6 +67,5 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'set.access.cookie' => \App\Http\Middleware\SetAccessTokenCookie::class,
         'jwt.cookie.auth' => \App\Http\Middleware\JwtAuthenticateFromCookie::class,
-        'extract.jwt.from.Cookie' => \App\Http\Middleware\ExtractJwtFromCookie::class,
     ];
 }

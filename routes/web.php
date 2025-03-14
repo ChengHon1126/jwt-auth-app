@@ -35,8 +35,6 @@ Route::middleware(['jwt.cookie.auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
-    // 其他受保護的路由...
 });
 // Route::get('/upload', [WorkController::class, 'create'])->name('upload');
 Route::get('/upload', [WorkController::class, 'create'])->name('upload');

@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginController extends Controller
 {
@@ -32,30 +36,33 @@ class LoginController extends Controller
             ], 422);
         }
 
-        // 嘗試登入
-        $credentials = $request->only('email', 'password');
+        try {
+            // 手動驗證用戶
+            $user = User::where('email', $request->email)->first();
 
-        if (!$token = auth('api')->attempt($credentials)) {
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'status' => 'error',
+                    'error' => '提供的憑證不正確'
+                ], 401);
+            }
+
+            // 直接使用 JWTAuth 生成 token
+            $token = JWTAuth::fromUser($user);
+
+            // 登入成功，返回JWT令牌
+            return response()->json([
+                'status' => 'success',
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60 // 使用配置中的 TTL
+            ]);
+        } catch (JWTException $e) {
             return response()->json([
                 'status' => 'error',
-                'error' => '提供的憑證不正確'
-            ], 401);
+                'error' => '無法創建令牌'
+            ], 500);
         }
-        // Cookie::make($name, $value, $minutes, $path, $domain, $secure, $httpOnly)
-        // $name：Cookie 的名稱。
-        // $value：Cookie 的值。
-        // $minutes：Cookie 的有效期（以分鐘為單位）。
-        // $path：Cookie 的路徑。
-        // $domain：Cookie 的域名。
-        // $secure：是否僅限 HTTPS。
-        // $httpOnly：是否僅限 HTTP（設置為 true 表示 HTTP Only）。
-        // 登入成功，返回JWT令牌
-        return response()->json([
-            'status' => 'success',
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
-        ]);
     }
 
     /**
@@ -63,9 +70,16 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function me(Request $request)
     {
-        return response()->json(auth('api')->user());
+        $token = $request->cookie('access_token');
+        Log::info('取得用戶信息' . $token);
+        JWTAuth::setToken($token);
+        $user = JWTAuth::toUser($token);
+        return response()->json([
+            'status' => 'success',
+            'user' => $user
+        ], 200);
     }
 
     /**
