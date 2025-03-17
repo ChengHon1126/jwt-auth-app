@@ -12,16 +12,17 @@ class Collects extends Model
     protected $table = 'collects';
     protected $fillable = [
         'user_id',
-        'work_id',
+        'collectable_id',
+        'collectable_type'
     ];
+    public function collectable()
+    {
+        return $this->morphTo();
+    }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-    public function work()
-    {
-        return $this->belongsTo(Work::class, 'work_id', 'id');
+        return $this->belongsTo(User::class);
     }
 
     /**

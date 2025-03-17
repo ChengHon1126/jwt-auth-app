@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\CollectController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DownFileController;
 use App\Http\Controllers\Api\LessonPlanController;
@@ -46,7 +47,7 @@ Route::middleware(['jwt.cookie.auth', 'jwt.auth'])->group(function () {
     Route::get('/works/pennding', [WorkController::class, 'getPenndingWorks']); // 顯示待簽核資料
     Route::get('/works_show', [DashboardController::class, 'work_show']); // 顯示作品詳情
     Route::get('/works/collects', [WorkController::class, 'getCollectsWork']); // 顯示收藏
-    Route::post('works/collects', [WorkController::class, 'toggleCollect']); // 收藏
+    Route::post('works/collects', [CollectController::class, 'toggleCollect']); // 收藏
 
     Route::get('/files/download', [DownFileController::class, 'downloadFile']);
     // 審核作品
@@ -56,9 +57,13 @@ Route::middleware(['jwt.cookie.auth', 'jwt.auth'])->group(function () {
     Route::get('/works/comments', [WorkRatingController::class, 'getComments']);
     Route::post('/works/rate-and-comment', [WorkRatingController::class, 'rateAndComment']);
 
-    // 上傳教案
-    Route::post('/lesson-plans', [LessonPlanController::class, 'create']);
-    Route::get('/lesson-plans', [LessonPlanController::class, 'index']);
-    Route::put('/lesson-plans', [LessonPlanController::class, 'push']);
-    Route::delete('/lesson-plans', [LessonPlanController::class, 'delete']);
+    // 教案
+    Route::post('/lesson-plans', [LessonPlanController::class, 'create']); // 新增教案
+    Route::get('/lesson-plans', [LessonPlanController::class, 'index']); // 取得教案
+    Route::put('/lesson-plans', [LessonPlanController::class, 'push']); // 修改教案
+    Route::delete('/lesson-plans', [LessonPlanController::class, 'delete']); // 刪除教案
+
+    Route::get('/lesson-plans/public', [LessonPlanController::class, 'public']); // 取得全部教案
+    Route::get('/lesson-plans/my', [LessonPlanController::class, 'my']); // 取得我的教案
+    Route::post('/lesson-plans/collect', [CollectController::class, 'toggleCollect']); // 增加蒐藏
 });

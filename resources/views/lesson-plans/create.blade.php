@@ -2,6 +2,10 @@
 
 @section('title', '上傳教案')
 
+@push('scripts')
+<script src="{{ asset('js/lessons/admin.js') }}"></script>
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto" x-data="lessonPlanForm()">
@@ -187,7 +191,7 @@
                                 <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <p x-text="formData.file.name" class="text-sm text-blue-700"></p>
+                                <p x-text="formData.file?.name" class="text-sm text-blue-700"></p>
                             </div>
                         </div>
                     </div>
@@ -203,119 +207,6 @@
 </div>
 
 <script>
-    function lessonPlanForm() {
-        return {
-            formData: {
-                title: '',
-                description: '',
-                grade_levels: [],
-                teaching_goals: '',
-                activities: '',
-                file: null
-            },
-            errors: {},
-            isSubmitting: false,
-            fileProgress: 0,
-            message: {
-                text: '',
-                type: ''
-            },
-            
-            // 處理檔案上傳
-            handleFileUpload(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    // 檢查檔案類型
-                    if (file.type !== 'application/pdf') {
-                        this.errors.file = '只允許上傳 PDF 檔案';
-                        return;
-                    }
-                    
-                    // 檢查檔案大小 (10MB)
-                    if (file.size > 10 * 1024 * 1024) {
-                        this.errors.file = '檔案大小不能超過 10MB';
-                        return;
-                    }
-                    
-                    this.formData.file = file;
-                    this.errors.file = null;
-                }
-            },
-            
-            // 提交表單
-            async submitForm() {
-                this.isSubmitting = true;
-                this.errors = {};
-                this.message = { text: '', type: '' };
-                
-                try {
-                    // 表單驗證
-                    if (!this.formData.title) {
-                        this.errors.title = '請輸入教案標題';
-                    }
-                    
-                    if (this.formData.grade_levels.length === 0) {
-                        this.errors.grade_levels = '請至少選擇一個適用年級';
-                    }
-                    
-                    if (!this.formData.file) {
-                        this.errors.file = '請上傳教案檔案';
-                    }
-                    
-                    // 如果有錯誤則停止提交
-                    if (Object.keys(this.errors).length > 0) {
-                        this.isSubmitting = false;
-                        return;
-                    }
-                    
-                    // 建立 FormData 對象來處理檔案上傳
-                    const formData = new FormData();
-                    formData.append('title', this.formData.title);
-                    formData.append('description', this.formData.description || '');
-                    this.formData.grade_levels.forEach(grade => {
-                        formData.append('grade_levels[]', grade);
-                    });
-                    formData.append('teaching_goals', this.formData.teaching_goals || '');
-                    formData.append('activities', this.formData.activities || '');
-                    formData.append('file', this.formData.file);
-                    
-                    // 發送 API 請求
-                    const response = await axios.post('/api/lesson-plans', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        },
-                        onUploadProgress: (progressEvent) => {
-                            this.fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        }
-                    });
-                    
-                    // 處理成功回應
-                    this.message = {
-                        text: '教案上傳成功！',
-                        type: 'success'
-                    };
-                    
-                    alert('教案上傳成功！');
-                    window.location.href = '/admin';
-                    
-                } catch (error) {
-                    alert('上傳失敗，請稍後再試。');
-                    console.error('上傳失敗:', error);
-                    
-                    // 處理驗證錯誤
-                    if (error.response && error.response.data && error.response.data.errors) {
-                        this.errors = error.response.data.errors;
-                    } else {
-                        this.message = {
-                            text: '上傳失敗，請稍後再試。',
-                            type: 'error'
-                        };
-                    }
-                } finally {
-                    this.isSubmitting = false;
-                }
-            }
-        };
-    }
+    
 </script>
 @endsection

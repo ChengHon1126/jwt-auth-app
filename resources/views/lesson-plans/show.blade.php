@@ -89,8 +89,4 @@
         'fetchDataFunc' => 'fetchData'
     ])
 </div>
-
-<script>
-    
-</script>
 @endsection

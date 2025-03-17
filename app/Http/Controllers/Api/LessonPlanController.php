@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Collects;
 use App\Models\LessonPlanGrade;
 use App\Models\LessonPlans;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +14,55 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LessonPlanController extends Controller
 {
+
+    public function public(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $userId = JWTAuth::user()->id;
+
+        $lessonPlans = LessonPlans::with([
+            'grades' => function ($query) {
+                $query->select('id', 'lesson_plan_id', 'grade_level')
+                    ->groupBy('grade_level', 'id', 'lesson_plan_id');
+            },
+        ])->where('is_delete', false)
+            ->where('is_approved', true)
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
+
+        // 如果用户已登录，检查收藏状态
+        if ($userId) {
+            $lessonPlans->getCollection()->transform(function ($lessonPlan) use ($userId) {
+                // 直接使用模型中的方法检查是否收藏
+                $lessonPlan->is_collected = $lessonPlan->isCollectedBy($userId);
+                return $lessonPlan;
+            });
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $lessonPlans
+        ]);
+    }
+    public function my(Request $request)
+    {
+
+        $perPage = $request->input('per_page', 10);
+        $lessonPlans = LessonPlans::with([
+            'grades' => function ($query) {
+                $query->select('id', 'lesson_plan_id', 'grade_level')
+                    ->groupBy('grade_level', 'id', 'lesson_plan_id');
+            },
+        ])->where('is_delete', false)
+            ->where('user_id', JWTAuth::user()->id)
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $lessonPlans
+        ]);
+    }
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
@@ -20,7 +70,9 @@ class LessonPlanController extends Controller
             'grades' => function ($query) {
                 $query->select('lesson_plan_id', 'grade_level');
             },
-        ])->where('is_delete', false)->paginate($perPage);
+        ])->where('is_delete', false)
+            ->orderBy('is_approved', 'asc')
+            ->paginate($perPage);
 
         return response()->json([
             'status' => 'success',

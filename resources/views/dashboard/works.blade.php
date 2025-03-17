@@ -196,14 +196,14 @@
                                 </div>
                                 <p class="text-gray-600 mb-4 line-clamp-2" x-text="collect.work.description"></p>
                                 <div class="flex justify-between items-center">
-                                    <a :href="`/works/${collect.work_id}`" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    <a :href="`/works/${collect.collectable_id}`" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
                                         查看詳情
                                         <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                                         </svg>
                                     </a>
                                     <button 
-                                        @click="cancelCollect(collect.work_id)" 
+                                        @click="cancelCollect(collect.collectable_id)" 
                                         class="text-yellow-500 hover:text-yellow-600 transition-colors"
                                         title="取消收藏"
                                     >

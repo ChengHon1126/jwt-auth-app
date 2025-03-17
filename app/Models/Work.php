@@ -29,10 +29,19 @@ class Work extends Model
         return $this->hasMany(File::class, 'work_id', 'id');
     }
 
+    // 修改为多态关联
     public function collects()
     {
-        return $this->hasMany(Collects::class, 'work_id', 'id');
+        // 使用基本的 morphMany 方法，但不要添加 where 條件
+        return $this->morphMany(Collects::class, 'collectable');
     }
+
+    public function isCollectedBy($userId)
+    {
+        return $this->collects()->where('user_id', $userId)->exists();
+    }
+
+
     // 統一回傳時間格式
     protected function serializeDate(\DateTimeInterface $date)
     {

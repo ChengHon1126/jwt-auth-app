@@ -31,4 +31,17 @@ class LessonPlans extends Model
     {
         return $this->hasMany(LessonPlanGrade::class, 'lesson_plan_id', 'id');
     }
+
+    // 在LessonPlan模型中
+    public function collects()
+    {
+        // 使用基本的 morphMany 方法，但不要添加 where 條件
+        return $this->morphMany(Collects::class, 'collectable');
+    }
+
+    // 检查当前用户是否收藏了此教案
+    public function isCollectedBy($userId)
+    {
+        return $this->collects()->where('user_id', $userId)->exists();
+    }
 }

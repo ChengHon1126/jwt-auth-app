@@ -97,7 +97,8 @@
     },
     collects(){
         const form = new FormData();
-        form.append('work_id', this.work.id);
+        form.append('collectable_id', this.work.id);
+        form.append('collectable_type', 'works');
         axios.post(`/api/works/collects`, form)
             .then(response => {
                 if (response.data.status === 'success') {

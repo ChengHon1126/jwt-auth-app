@@ -111,16 +111,25 @@ class WorkController extends Controller
     {
         $user_id = JWTAuth::user()->id;
         $perPage = $request->input('per_page', 9);
-        $page = $request->input('page', 1); // 接收頁碼參數
+        $page = $request->input('page', 1);
 
-        $collects = Collects::with([
-            'work' => function ($query) {
-                $query->select('id', 'title', 'description', 'image_path', 'user_id', 'created_at');
-            }
-        ])
-            ->where('user_id', $user_id)
+        // 只查询作品类型的收藏
+        $collects = Collects::where('user_id', $user_id)
+            ->Where('collectable_type', 'works') // 兼容旧数据
             ->orderBy('id', 'desc')
             ->paginate($perPage);
+
+        // 加载关联的作品
+        $collects->getCollection()->transform(function ($collect) {
+            // 手动加载作品信息
+            $work = \App\Models\Work::select('id', 'title', 'description', 'image_path', 'user_id', 'created_at')
+                ->find($collect->collectable_id);
+
+            // 将作品信息设置到 work 属性，保持与原来相同的数据结构
+            $collect->work = $work;
+
+            return $collect;
+        });
 
         return response()->json(['collects' => $collects]);
     }
@@ -167,25 +176,46 @@ class WorkController extends Controller
 
     public function toggleCollect(Request $request)
     {
-        $work_id = $request->input('work_id');
+        // 获取参数
+        $collectableId = $request->input('collectable_id');
+        $collectableType = $request->input('collectable_type');
         $user_id = JWTAuth::user()->id;
 
         // 使用鎖定機制避免競態條件
         DB::beginTransaction();
         try {
+            // 适配旧参数 (work_id)
+            if (!$collectableId && $request->has('work_id')) {
+                $collectableId = $request->input('work_id');
+                $collectableType = 'works'; // 或者使用 'works'，取决于您的实现
+            }
+
+            // 验证必要参数
+            if (!$collectableId || !$collectableType) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => '缺少必要参数'
+                ], 400);
+            }
+
+            // 查询是否已收藏
             $collection = Collects::where('user_id', $user_id)
-                ->where('work_id', $work_id)
-                ->lockForUpdate() // 鎖定行
+                ->where('collectable_id', $collectableId)
+                ->where('collectable_type', $collectableType)
+                ->lockForUpdate() // 锁定行防止并发问题
                 ->first();
 
             if ($collection) {
+                // 已收藏，取消收藏
                 $collection->delete();
                 $isCollected = false;
                 $message = '取消收藏成功';
             } else {
+                // 未收藏，添加收藏
                 Collects::create([
                     'user_id' => $user_id,
-                    'work_id' => $work_id,
+                    'collectable_id' => $collectableId,
+                    'collectable_type' => $collectableType,
                 ]);
                 $isCollected = true;
                 $message = '收藏成功';
@@ -201,7 +231,7 @@ class WorkController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => '操作失敗'
+                'message' => '操作失敗: ' . $e->getMessage()
             ], 500);
         }
     }

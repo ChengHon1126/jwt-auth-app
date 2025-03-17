@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Collects;
 use App\Models\File;
 use App\Models\Work;
 use Illuminate\Http\Request;
@@ -24,18 +25,30 @@ class DashboardController extends Controller
         $request->validate([
             'id' => 'required|integer'
         ]);
+
         $id = $request->id;
+        $userId = JWTAuth::user()->id;
+
         $work = Work::with([
             'files' => function ($query) {
                 $query->orderBy('id', 'desc')->first();
             },
             'user' => function ($query) {
                 $query->select('id', 'name');
-            },
-            'collects' => function ($query) {
-                $query->where('user_id', JWTAuth::user()->id);
             }
         ])->where('id', $id)->first();
+
+        if ($work) {
+            // 使用新的多态关系检查是否收藏
+            $isCollected = Collects::where('user_id', $userId)
+                ->where('collectable_id', $id)
+                ->where('collectable_type', 'works')
+                ->exists();
+
+            // 将收藏状态添加到作品数据中
+            $work->is_collected = $isCollected;
+        }
+
         return response()->json([
             'work' => $work
         ]);
