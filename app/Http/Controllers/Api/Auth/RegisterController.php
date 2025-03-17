@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RegisterController extends Controller
 {
@@ -40,9 +41,8 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // 可選：創建 JWT token
-        // $token = auth('api')->login($user);
-
+        // 可選：創建 tymon/jwt-auth token
+        $token = JWTAuth::fromUser($user);
         // 返回成功響應
         return response()->json([
             'status' => 'success',
@@ -54,7 +54,7 @@ class RegisterController extends Controller
                 'created_at' => $user->created_at,
             ],
             // 如果要在註冊後立即登入，可以添加:
-            // 'access_token' => $token,
+            'access_token' => $token,
             // 'token_type' => 'bearer',
             // 'expires_in' => auth('api')->factory()->getTTL() * 60
         ], 201);

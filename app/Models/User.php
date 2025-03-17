@@ -48,6 +48,11 @@ class User extends Authenticatable implements JWTSubject // 添加 implements JW
     {
         return $this->getKey();
     }
+
+    public function workRatings()
+    {
+        return $this->hasMany(WorkRating::class);
+    }
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *

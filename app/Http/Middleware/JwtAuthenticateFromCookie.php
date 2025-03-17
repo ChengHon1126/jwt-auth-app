@@ -18,7 +18,7 @@ class JwtAuthenticateFromCookie
         $token = $request->cookie('access_token');
         if (!$token) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => '未授權'], 401);
+                return response()->json(['message' => '未授權', 'redirect' => route('login')], 401);
             }
             return redirect()->route('login');
         }

@@ -4,74 +4,28 @@
 @section('title', '控制面板')
 
 @push('scripts')
+<script src="{{ asset('js/dashboard.js') }}"></script>
 <script src="{{ asset('js/logout.js') }}"></script>
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="{
-    async init(){
-        Alpine.store('user', {
-            id: null,
-            name: null,
-            email: null,
-            role: null,
-            isLoaded: false,
-            isLoggedIn: false,
-
-            set(userData) {
-                this.id = userData.id;
-                this.name = userData.name;
-                this.email = userData.email;
-                this.role = userData.role;
-                this.isLoggedIn = true;
-                this.isLoaded = true;
-                console.log('User data set:', this); // 添加日誌
-            },
-
-            clear() {
-                this.id = null;
-                this.name = null;
-                this.email = null;
-                this.role = null;
-                this.isLoggedIn = false;
-                this.isLoaded = true;
-                console.log('User data cleared:', this); // 添加日誌
-            }
-        });
-        this.fetchUserData();
-    },
-    async fetchUserData() {
-        const response = await axios.get('/api/auth/me', {
-            withCredentials: true
-        })
-        try{
-                const data = response.data;
-                console.log('獲取用戶資料:', data);
-                if (data.status === 'success' && data.user) {
-                    if (window.Alpine && Alpine.store('user')) {
-                        Alpine.store('user').set(data.user);
-                    }
-                    document.dispatchEvent(new CustomEvent('user-authenticated', {
-                        detail: data.user
-                    }));
-                }
-            } catch (error) {
-                console.log('獲取用戶資料失敗:', error);
-                if (window.Alpine && Alpine.store('user')) {
-                    Alpine.store('user').clear();
-                }
-                document.dispatchEvent(new CustomEvent('user-unauthenticated'));
-            }
-    }
-}">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="dashboard()">
     <!-- 頭部區域 -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">歡迎來到控制面板</h1>
                 <p class="mt-2 text-gray-600">您已成功登入系統，可以開始管理您的內容。</p>
-                <p x-text="$store.user.name"></p>
             </div>
+            <button x-show="$store.user.role === 1"
+                    id="admin-button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center mr-4"
+                    onclick="window.location.href='/admin'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a2 2 0 00-2 2v1H6a2 2 0 00-2 2v1H3a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2v-6a2 2 0 00-2-2h-1V7a2 2 0 00-2-2h-2V4a2 2 0 00-2-2zm0 2h2v1h-2V4zm-4 3h8v1H6V7zm-3 3h14v6H3v-6z" />
+                    </svg>
+                    後臺管理
+                </button>
             <button
                 id="logout-button"
                 class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center"

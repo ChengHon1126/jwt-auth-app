@@ -1,0 +1,71 @@
+/* 標題和描述 */
+.table-header {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+/* 表格行 */
+.table-row {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* 按鈕 */
+.button {
+    background-color: #4a5568;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+    background-color: #2d3748;
+    transform: translateY(-0.25rem);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 審核按鈕 */
+.review-button {
+    background-color: #38a169;
+    color: white;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.review-button:hover {
+    background-color: #2f855a;
+    transform: translateY(-0.25rem);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 加載動畫 */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 適用年級標籤 */
+.grade-tag {
+    display: inline-block;
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 0.375rem;
+}

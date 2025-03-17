@@ -23,6 +23,7 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+
         // 驗證請求數據
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
